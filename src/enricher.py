@@ -6,7 +6,7 @@ from datetime import datetime
 
 class DataEnricher:
     def __init__(self, db_path=None):
-        # Ruta absoluta de la raíz del proyecto
+        # Esta es la ruta absoluta de la raíz del proyecto
         self.project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
         # Organiza y prepara el entorno para el enriquecimiento de datos
@@ -22,7 +22,7 @@ class DataEnricher:
         self.enriched_db_path = os.path.join(self.data_dir, "enriched_historical.db")
         self.csv_path = os.path.join(self.data_dir, "enriched_historical.csv")  # Nueva ruta para CSV
 
-        # Configurar sistema de logging
+        # Configura sistema de logging
         self.logger = logging.getLogger('DataEnricher')
         self._setup_logger()
 

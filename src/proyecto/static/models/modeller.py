@@ -32,13 +32,22 @@ from sklearn.metrics import mean_squared_error
 """Descarga de los datos de GitHub y carga para el modelo"""
 
 # Directorio de Google Colab
-data_dir = "/content"
+# data_dir = "/content"
 
 # Descargamos la base de datos desde GitHub
-enriched_db_path = os.path.join(data_dir, "enriched_historical.db")
+# enriched_db_path = os.path.join(data_dir, "enriched_historical.db") # Esta línea fue modificada
+# if not os.path.exists(enriched_db_path):
+#     print("🔄 Descargando la base de datos desde GitHub")
+#     os.system(f"wget -O {enriched_db_path} https://raw.githubusercontent.com/jimymora25/Tarea_2_Proyecto_Integrado_V/main/src/proyecto/static/data/enriched_historical.db")
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+data_dir_abs = os.path.abspath(os.path.join(script_dir, '..', 'data'))
+enriched_db_path = os.path.join(data_dir_abs, "enriched_historical.db")
+
 if not os.path.exists(enriched_db_path):
-    print("🔄 Descargando la base de datos desde GitHub")
-    os.system(f"wget -O {enriched_db_path} https://raw.githubusercontent.com/jimymora25/Tarea_2_Proyecto_Integrado_V/main/src/proyecto/static/data/enriched_historical.db")
+    print(f"❌ ERROR: El archivo '{enriched_db_path}' no se encontró.")
+    raise FileNotFoundError(f"Archivo de base de datos no encontrado: {enriched_db_path}")
+
 
 # Nos conectamos a la base de datos y cargamos los datos
 conn = sqlite3.connect(enriched_db_path)
@@ -108,7 +117,7 @@ plt.show()
 # Los rezagos van a 0 a 30
 # Las barras del gráfico indica el coeficiente de autocorrelación para un rezago en específico
 # El intérvalo de confianza (área azul sombreada), indicando que si las barras salen del área, significa que la autocorrelación en ese rezago es estadísticamente significativa
-# Todas las barras por encima del intérvalo de confianza tienen una autocorrelación positivas y fuerte, lo que indica una fuerte influencia en los valores futuros
+# Todas las barras por encima del intérvalo de confianza tienen una autocorrelación positivas y fuerte, lo que indica una influencia en los valores futuros
 
 """Entrenamiento del modelo ARIMA"""
 
@@ -139,14 +148,13 @@ print(f"🔍 RMSE del modelo ARIMA: {rmse:.2f}")
 print(f"📊 Media del precio de cierre: {media_close:.2f}")
 print(f"📏 Relación RMSE / Media: {relacion_rmse_media:.4f}")
 
-
-# El resultado nos indiica que en promedio, el modelo tiene un error del 5.25% con respecto al precio de cierre medio.
+# El resultado nos indica que en promedio, el modelo tiene un error del 5.25% con respecto al precio de cierre medio.
 # Un RMSE entre el 5% y 10% de la media, se considera aceptable para modelos de predicción
 
 #Evaluación precciones vs datos reales
 plt.figure(figsize=(12, 6))
-plt.plot(df.index[-50:], df["close"].tail(50), label="Real", color="blue")  # Últimos 50 datos reales
-plt.plot(df.index[-50:], y_pred[-50:], label="Predicción", color="red", linestyle="dashed")  # Últimos 50 valores predichos
+plt.plot(df.index[-50:], df["close"].tail(50), label="Real", color="blue")   # Últimos 50 datos reales
+plt.plot(df.index[-50:], y_pred[-50:], label="Predicción", color="red", linestyle="dashed")   # Últimos 50 valores predichos
 plt.legend()
 plt.title("Comparación de datos reales vs. predicción")
 plt.show()
@@ -157,11 +165,16 @@ plt.show()
 """Guardado del modelo"""
 
 # Directorio donde se guardará el modelo
-models_dir = "/content/models"
-os.makedirs(models_dir, exist_ok=True)
+# models_dir = "/content/models" 
+# os.makedirs(models_dir, exist_ok=True) 
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+models_dir_path = script_dir
+
+os.makedirs(models_dir_path, exist_ok=True)
 
 # Guardar el modelo
-model_path = os.path.join(models_dir, "arima_model.pkl")
+model_path = os.path.join(models_dir_path, "arima_model.pkl")
 joblib.dump(model_fit, model_path)
 
 print(f"✅ Modelo ARIMA guardado en: {model_path}")
