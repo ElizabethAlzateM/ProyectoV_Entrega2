@@ -63,10 +63,10 @@ jobs:
           git add src/proyecto/static/data/historical.db \
                     src/proyecto/static/data/historical.csv \
                     src/proyecto/static/data/enriched_historical.db \
-                    src/proyecto/static/models/collector.log \
+                    src/proyecto/static/models/collector.log -f \
                     src/proyecto/static/models/arima_model.pkl
           git commit -m "Actualizar datos económicos y ejecutar pipelines" || echo "No hay cambios para commitear"
           git push origin main
 
       - name: 11. Trabajo completado
-        run: echo "Todos los cambios y script se ejecutaron. Flujo de trabajo finalizado."
+        run: echo "✅ Todos los cambios y sscripts fueron ejecutados. Flujo de trabajo finalizado."
