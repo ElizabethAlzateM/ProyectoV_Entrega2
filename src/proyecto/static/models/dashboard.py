@@ -23,8 +23,8 @@ Importación de librerías
 #!npm install -g localtunnel
 
 # Instalamos Streamlit y creamos un túnel para la conexión al dashboard
-!pip install streamlit
-!npm install -g localtunnel
+# !pip install streamlit
+# !npm install -g localtunnel
 
 """Pasos para creación de las métricas y creación del dashboard"""
 
