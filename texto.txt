@@ -1,0 +1,59 @@
+Proyecto: Análisis finanaciero de la moneda Ethereum
+Fuente de los datos: Yahoo finance
+
+Resumen de pasos para la ejecución:
+
+1. Ejecuta la carpeta principal donde se encuentran todos los archivos asociados al proyecto.
+
+2. Activar el entorno virtual
+
+3. Inicia la ejecución en el siguiente orden: collector.py, enricher.py, modeller.py, dashboard.py
+
+
+Detalle de la ejecución del proyecto: 
+Este documento describe los pasos necesarios para ejecutar el pipeline completo del proyecto, desde la recolección de datos hasta la visualización del dashboard interactivo.
+Asegúrate de tener Windows PowerShell como tu terminal.
+
+1. Navega a la carpeta raíz del proyecto
+Abre tu terminal de PowerShell y usa el siguiente comando para dirigirte a la carpeta principal de tu proyecto (ProyectoIntegrado5).
+cd "C:\Users\Usuario\Desktop\IUDigital_2025\Semestre 8 bloque 2 visualizacion y proyecto V\Proyecto_Integrado_V\Carpeta jimy\Tareas\Tarea 2\ProyectoIntegrado5"
+Verificación: Tu prompt de la terminal debe mostrar la ruta de tu proyecto, por ejemplo: PS C:\Users\Usuario\Desktop\...\ProyectoIntegrado5>
+
+2. Activa el Entorno Virtual
+Activa el entorno virtual (.venv) para asegurar que todas las bibliotecas del proyecto se utilicen correctamente.
+& ".\.venv\Scripts\activate"
+Verificación: Tu prompt de la terminal debe mostrar (.venv) al principio, por ejemplo: (.venv) PS C:\Users\Usuario\Desktop\...\ProyectoIntegrado5>
+
+3. Instala las dependencias (Opcional)
+Si es la primera vez que configuras el entorno o si has actualizado el archivo requirements.txt, ejecuta este comando para instalar o actualizar las bibliotecas necesarias.
+pip install -r requirements.txt
+Verificación: Verás mensajes de instalación. Si ya están instaladas, indicará "Requirement already satisfied".
+
+4. Ejecuta el script collector.py (Recolección de Datos)
+Este script se encarga de obtener los datos históricos de precios de la criptomoneda y guardarlos en historical.db y historical.csv a través de web scraping con BeautifulSoup
+python src/collector.py
+Verificación: Observa los mensajes en la terminal que indican la obtención y el guardado de los datos. Espera a que el script termine completamente.
+
+5. Ejecuta el script enricher.py (Enriquecimiento de datos)
+Después de la recolección, este script procesa los datos históricos, añadiéndoles características temporales (año, mes, día, etc.) y los guarda en enriched_historical.db.
+python src/enricher.py
+Verificación: La terminal mostrará mensajes sobre la carga y el guardado de los datos enriquecidos. Espera a que el script termine.
+
+6. Ejecuta el script modeller.py (Entrenamiento del modelo)
+Este script utiliza los datos enriquecidos para entrenar el modelo ARIMA de predicción y guarda el modelo entrenado como model.pkl.
+python src/modeller.py
+
+Verificación: Verás mensajes sobre el entrenamiento del modelo, el RMSE obtenido, y la confirmación de que el modelo ha sido guardado. Espera a que el script termine.
+
+7. Ejecuta el dashboard de Streamlit (dashboard.py)
+Finalmente, este comando iniciará tu aplicación web interactiva.
+streamlit run src/dashboard.py
+
+Verificación: La terminal mostrará la url de un túnel local para acceder al dashboard
+Tu navegador web predeterminado se abrirá automáticamente en esa URL. O en su defecto, deberás digitar la contraseña de acceso, la cual podrás encontrar en la ejecución del dashboard
+El dashboard mostrará los datos históricos, un gráfico interactivo, la predicción para el día siguiente y, si se configuró, los detalles del modelo.
+
+Notas Importantes:
+Ejecuta cada comando individualmente y espera a que el anterior finalice.
+Si encuentras algún error en la terminal, cópialo y pégalo para obtener ayuda.
+Asegúrate de que tus archivos .py estén actualizados con las últimas versiones proporcionadas.
