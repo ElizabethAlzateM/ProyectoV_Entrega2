@@ -1,0 +1,68 @@
+name: Actualizar Datos ETH 
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: '0 0 * * *' 
+  push:
+    branches:
+      - main 
+  workflow_dispatch: 
+
+# Definición de los trabajos a ejecutar
+jobs:
+  actualizar_datos:
+    runs-on: ubuntu-latest 
+
+    steps:
+      - name: 1. Configurar flujo de trabajo - Checkout del código
+        uses: actions/checkout@v4 
+        with:
+          fetch-depth: 0
+
+      - name: 2. Configurar Python 3.9
+        uses: actions/setup-python@v5 
+        with:
+          python-version: '3.9' 
+
+      - name: 3. Instalar dependencias
+        run: | 
+          python -m pip install --upgrade pip # Actualiza pip a la última versión
+          pip install -r requirements.txt # Instala las librerías listadas en requirements.txt
+
+      - name: 4. Ejecutar script de recolección (Collector)
+        run: |
+          python src/proyecto/static/models/collector.py # Ejecuta el script Python para recolectar datos
+
+      - name: 5. Ejecutar script de enriquecimiento (Enricher)
+        run: |
+          python src/enricher.py # Ejecuta el script Python para enriquecer los datos
+
+      - name: 6. Ejecutar script de modelado (Modeller)
+        run: |
+          python src/proyecto/static/models/modeller.py # Ejecuta el script Python de modelado
+
+      - name: 7. Ejecutar script de la aplicación (App)
+        run: |
+          python src/proyecto/static/models/app.py # Ejecuta el script Python de la aplicación (ej. Streamlit)
+
+      - name: 8. Ejecutar script del dashboard (Dashboard)
+        run: |
+          python src/proyecto/static/models/dashboard.py
+
+      - name: 9. Listamos archivos y directorios (para depuración)
+        run: ls -lR 
+
+      - name: 10. Commit y subir cambios
+        run: |
+          git config --local user.email "github-actions@github.com"
+          git config --local user.name "GitHub Actions" 
+          git add src/proyecto/static/data/historical.db \
+                    src/proyecto/static/data/historical.csv \
+                    src/proyecto/static/data/enriched_historical.db \
+                    src/proyecto/static/models/collector.log \
+          git push origin main # Sube los cambios a la rama 'main' de GitHub
+      - name: 11. Trabajo completado
+        run: echo "Todos los scripts ejecutados y cambios realizados. Flujo de trabajo finalizado." 
