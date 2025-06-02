@@ -1,68 +1,72 @@
-name: Actualizar Datos ETH 
+name: Actualizar Datos ETH
 
 permissions:
   contents: write
 
 on:
   schedule:
-    - cron: '0 0 * * *' 
+    - cron: '0 0 * * *'
   push:
     branches:
-      - main 
-  workflow_dispatch: 
+      - main
+  workflow_dispatch:
 
-# Definición de los trabajos a ejecutar
 jobs:
   actualizar_datos:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
 
     steps:
-      - name: 1. Configurar flujo de trabajo - Checkout del código
-        uses: actions/checkout@v4 
+      - name: 1. Configurar flujo de trabajo
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 2. Configurar Python 3.9
-        uses: actions/setup-python@v5 
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9' 
+          python-version: '3.9'
 
       - name: 3. Instalar dependencias
-        run: | 
-          python -m pip install --upgrade pip # Actualiza pip a la última versión
-          pip install -r requirements.txt # Instala las librerías listadas en requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: 4. Ejecutar script de recolección (Collector)
         run: |
-          python src/proyecto/static/models/collector.py # Ejecuta el script Python para recolectar datos
+          python src/proyecto/static/models/collector.py
 
       - name: 5. Ejecutar script de enriquecimiento (Enricher)
         run: |
-          python src/enricher.py # Ejecuta el script Python para enriquecer los datos
+          python src/enricher.py
 
       - name: 6. Ejecutar script de modelado (Modeller)
         run: |
-          python src/proyecto/static/models/modeller.py # Ejecuta el script Python de modelado
+          python src/proyecto/static/models/modeller.py
 
       - name: 7. Ejecutar script de la aplicación (App)
         run: |
-          python src/proyecto/static/models/app.py # Ejecuta el script Python de la aplicación (ej. Streamlit)
+          python src/proyecto/static/models/app.py
 
       - name: 8. Ejecutar script del dashboard (Dashboard)
         run: |
           python src/proyecto/static/models/dashboard.py
 
-      - name: 9. Listamos archivos y directorios (para depuración)
-        run: ls -lR 
+      - name: 9. Listamos archivos y directorios
+        run: ls -lR
 
       - name: 10. Commit y subir cambios
         run: |
+          git --version
           git config --local user.email "github-actions@github.com"
-          git config --local user.name "GitHub Actions" 
+          git config --local user.name "GitHub Actions"
           git add src/proyecto/static/data/historical.db \
                     src/proyecto/static/data/historical.csv \
                     src/proyecto/static/data/enriched_historical.db \
-                    src/proyecto/static/models/collector.log \
-          git push origin main # Sube los cambios a la rama 'main' de GitHub
+                    src/proyecto/static/models/collector.log -f \
+                    src/proyecto/static/models/arima_model.pkl
+          git commit -m "Actualizar datos económicos y ejecutar pipelines" || echo "No hay cambios para commitear"
+          git push origin main
+
       - name: 11. Trabajo completado
-        run: echo "Todos los scripts ejecutados y cambios realizados. Flujo de trabajo finalizado." 
+        run: echo "✅ Todos los cambios y sscripts fueron ejecutados. Flujo de trabajo finalizado."
