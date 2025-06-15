@@ -25,6 +25,47 @@
 2025-06-02 01:40:24,180 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
 2025-06-02 01:40:24,196 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
 2025-06-02 01:40:24,204 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
-2025-06-14 22:25:21,564 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
-2025-06-14 22:25:21,786 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
-2025-06-14 22:25:21,790 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-02 16:46:34,361 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-02 16:46:34,379 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-02 16:46:34,383 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-03 01:37:29,202 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-03 01:37:29,217 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-03 01:37:29,221 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-04 01:37:38,248 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-04 01:37:38,262 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-04 01:37:38,267 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-05 01:27:59,187 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-05 01:27:59,201 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-05 01:27:59,206 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-06 01:27:42,459 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-06 01:27:42,474 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-06 01:27:42,479 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-07 01:27:36,356 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-07 01:27:36,369 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-07 01:27:36,373 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-08 01:44:14,878 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-08 01:44:14,891 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-08 01:44:14,896 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-09 01:42:17,665 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-09 01:42:17,686 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-09 01:42:17,693 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-10 01:38:36,983 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-10 01:38:36,997 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-10 01:38:37,001 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-11 01:38:24,655 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-11 01:38:24,672 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-11 01:38:24,676 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-12 01:28:13,884 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-12 01:28:13,898 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-12 01:28:13,906 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-13 01:37:54,342 - DataCollector - ERROR - ⚠ Error al obtener los datos, código: 404
+2025-06-13 01:37:54,343 - DataCollector - ERROR - ⚠ No se pudieron obtener datos, el proceso se detiene.
+2025-06-14 01:26:25,489 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-14 01:26:25,503 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-14 01:26:25,507 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-15 01:46:03,259 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-15 01:46:03,336 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-15 01:46:03,341 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
+2025-06-15 02:17:26,822 - DataCollector - INFO - ✅ Datos obtenidos correctamente.
+2025-06-15 02:17:26,836 - DataCollector - INFO - ✅ Base de datos actualizada correctamente
+2025-06-15 02:17:26,840 - DataCollector - INFO - ✅ Datos guardados correctamente en CSV
