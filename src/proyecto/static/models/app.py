@@ -13,40 +13,49 @@ st.set_page_config(layout="wide", page_title="Dashboard de KPIs Financieros ETH"
 
 db_path = "enriched_historical.db"
 
+# Obtenemos la ruta absoluta del directorio donde se encuentra este script (app.py)
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-data_dir_abs = os.path.abspath(os.path.join(script_dir, '..', 'static', 'data'))
+# Si app.py está en 'src/proyecto/static/models/'
+# y enriched_historical.db está en 'src/proyecto/static/data/'
+# entonces para ir de 'models' a 'data', subimos un nivel (..) y luego bajamos a 'data'.
+data_dir_abs = os.path.abspath(os.path.join(script_dir, '..', 'data'))
 
+# Definimos la ruta completa para la base de datos enriquecida
 enriched_db_path = os.path.join(data_dir_abs, db_path)
+
 
 # Descargamos la base de datos desde GitHub si no existe
 if not os.path.exists(enriched_db_path):
-    st.write("-------Descargando la base de datos desde GitHub-------")
+    st.info("🔄 Descargando la base de datos desde GitHub... Esto puede tardar unos segundos.")
     try:
         url = "https://raw.githubusercontent.com/jimymora25/Tarea_2_Proyecto_Integrado_V/main/src/proyecto/static/data/enriched_historical.db"
-        response = requests.get(url)
-        if response.status_code == 200:
-            os.makedirs(data_dir_abs, exist_ok=True)
-            with open(enriched_db_path, "wb") as f:
-                f.write(response.content)
-            # st.write("✅ Base de datos descargada correctamente.") # Eliminado a petición del usuario
-        else:
-            st.error(f"❌ Error al descargar la base de datos: Código de estado {response.status_code}. Verifica la URL.")
-            st.stop()
+        response = requests.get(url, stream=True) # Usamos stream=True para descargas más eficientes
+        response.raise_for_status() # Lanza un HTTPError si la respuesta no es 200 (OK)
+
+        os.makedirs(data_dir_abs, exist_ok=True) # Crea el directorio si no existe
+
+        with open(enriched_db_path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192): # Descarga en chunks
+                f.write(chunk)
+        st.success("✅ Base de datos descargada correctamente.")
+    except requests.exceptions.RequestException as e:
+        st.error(f"❌ Error de red al descargar la base de datos: {e}. Verifica la URL o la conexión.")
+        st.stop()
     except Exception as e:
-        st.error(f"❌ Error al descargar la base de datos: {e}. Verifica la conexión a internet.")
+        st.error(f"❌ Error inesperado al descargar la base de datos: {e}.")
         st.stop()
 
 if not os.path.exists(enriched_db_path):
     st.error("❌ Error: No se pudo encontrar la base de datos después de intentar descargarla. La aplicación no puede continuar.")
     st.stop()
-# else: # Eliminado a petición del usuario
-#     st.write("✅ Base de datos disponible.") # Eliminado a petición del usuario
+
 
 @st.cache_data
-def load_data(path):
+def load_data(path, file_mod_time): # Añadimos file_mod_time como argumento para "romper" la caché
     """
     Carga los datos desde la base de datos SQLite y convierte la columna 'date' a datetime.
+    El argumento file_mod_time se usa para forzar la recarga cuando el archivo cambie.
     """
     conn = sqlite3.connect(path)
     df = pd.read_sql_query("SELECT * FROM enriched_historical", conn)
@@ -54,10 +63,16 @@ def load_data(path):
     df["date"] = pd.to_datetime(df["date"])
     return df
 
-df = load_data(enriched_db_path)
+# Obtenemos la última fecha de modificación del archivo para usarla en la caché
+# Esto fuerza a Streamlit a recargar los datos si el archivo .db cambia.
+try:
+    # Obtener el timestamp de la última modificación del archivo
+    file_modification_time = os.path.getmtime(enriched_db_path)
+except FileNotFoundError:
+    # Si el archivo no existe (aún no ha sido descargado en la ejecución actual), usa 0
+    file_modification_time = 0
 
-# st.write("✅ Datos cargados correctamente") # Eliminado a petición del usuario
-# st.dataframe(df.head()) # Eliminado a petición del usuario
+df = load_data(enriched_db_path, file_modification_time)
 
 # --- Cálculo de KPIs financieros ---
 
@@ -66,8 +81,6 @@ df["Moving Average 30"] = df["close"].rolling(window=30).mean()
 df["Volatility"] = df["close"].rolling(window=30).std()
 df["Cumulative Return"] = (1 + df["close"].pct_change().fillna(0)).cumprod()
 df["Price Range"] = df["high"] - df["low"]
-
-# st.write("✅ KPIs calculados correctamente!") # Eliminado a petición del usuario
 
 # --- Configuración del dashboard ---
 st.title("📊 Dashboard de KPIs Financieros de Ethereum (ETH)")
@@ -93,22 +106,29 @@ df_filtered_copy['year_month_day'] = df_filtered_copy['date'].dt.to_period('D')
 
 
 # --- Creación de Pestañas ---
-tab_overview, tab_metrics, tab_trends, tab_individual_kpis, tab_comparative_analysis, tab_composition = st.tabs([
+tab_overview, tab_metrics, tab_trends, tab_individual_kpis, tab_comparative_analysis, tab_distribution, tab_composition = st.tabs([
     "Resumen General",
     "Métricas Clave",
     "Tendencias Globales",
     "KPIs Individuales",
     "Análisis Comparativo",
+    "Distribución y Relación",
     "Composición"
 ])
 
 # Pestaña 1: Resumen General
 with tab_overview:
-    st.header("Resumen del periodo")
-    st.write("Aquí puedes encontrar un resumen general de los datos.")
+    st.header("Resumen del Periodo Seleccionado")
+    st.write("Aquí puedes encontrar un resumen de las métricas clave y una visión general de los datos.")
+
+    st.subheader("Vista Previa de los Datos Filtrados")
     st.dataframe(df_filtered_copy.head())
 
-# Pestaña 2: Métricas Clave (valores numéricos)
+    fig_close_price = px.line(df_filtered_copy, x="date", y="close", title="Precio de Cierre a lo largo del tiempo")
+    st.plotly_chart(fig_close_price)
+
+
+# Pestaña 2: Métricas Clave
 with tab_metrics:
     st.header("Métricas Clave")
     col1, col2, col3 = st.columns(3)
@@ -119,7 +139,7 @@ with tab_metrics:
     with col2:
         st.metric("📉 Media Móvil (30 días)", f"{df_filtered_copy['Moving Average 30'].iloc[-1]:.2f}")
     with col3:
-        st.metric("⚡ Volatilidad (STD Móvil 30 días)", f"{df_filtered_copy['Volatility'].iloc[-1]:.2f}")
+        st.metric("⚡ Volatilidad (STD Móvil 30 días)", f"{df_filtered_copy['Volatility'].iloc[-1]:.2f}%")
     with col4:
         st.metric("📊 Retorno Acumulado", f"{df_filtered_copy['Cumulative Return'].iloc[-1]:.2f}")
     with col5:
@@ -128,7 +148,7 @@ with tab_metrics:
         st.metric("💲 Precio de Cierre Promedio", f"{df_filtered_copy['close'].mean():.2f}")
 
 
-# Pestaña 3: Tendencias Globales (todos los gráficos de línea juntos)
+# Pestaña 3: Tendencias Globales
 with tab_trends:
     st.header("Tendencias Globales de KPIs")
 
@@ -138,7 +158,7 @@ with tab_trends:
     st.plotly_chart(px.line(df_filtered_copy, x="date", y="Cumulative Return", title="Retorno Acumulado del Precio de Cierre"))
 
 
-# Pestaña 4: KPIs Individuales (un gráfico por KPI, seleccionable o con opciones)
+# Pestaña 4: KPIs Individuales
 with tab_individual_kpis:
     st.header("Análisis de KPIs Individuales")
 
@@ -168,9 +188,9 @@ with tab_individual_kpis:
         st.plotly_chart(fig_comparison)
 
 
-# Pestaña 5: Análisis Comparativo
+# Pestaña 5: Análisis Comparativo (Gráficos de barras)
 with tab_comparative_analysis:
-    st.header("Análisis Comparativo")
+    st.header("Análisis Comparativo (Gráficos de Barras)")
 
     avg_close_by_year = df_filtered_copy.groupby('year')['close'].mean().reset_index()
     fig_bar_year = px.bar(avg_close_by_year, x='year', y='close',
@@ -216,7 +236,75 @@ with tab_comparative_analysis:
     fig_bar_h_return.update_yaxes(categoryorder='total ascending')
     st.plotly_chart(fig_bar_h_return)
 
-# Pestaña 6: Composición
+
+# Pestaña 6: Distribución de Datos (Histogramas y gráficos de dispersión)
+with tab_distribution:
+    st.header("Distribución y Relación entre Variables")
+
+    st.subheader("Histogramas de Distribución")
+    fig_hist_change = px.histogram(df_filtered_copy, x="Price Change %", nbins=50,
+                                   title="Distribución del Porcentaje de Cambio de Precio Diario",
+                                   labels={"Price Change %": "Cambio de Precio (%)"},
+                                   marginal="box",
+                                   color_discrete_sequence=['purple'])
+    st.plotly_chart(fig_hist_change)
+
+    fig_hist_volume = px.histogram(df_filtered_copy, x="volume", nbins=50,
+                                   title="Distribución del Volumen de Trading Diario",
+                                   labels={"volume": "Volumen"},
+                                   marginal="rug",
+                                   color_discrete_sequence=['teal'])
+    st.plotly_chart(fig_hist_volume)
+
+    fig_hist_range = px.histogram(df_filtered_copy, x="Price Range", nbins=50,
+                                   title="Distribución del Rango de Precio Diario (Máximo - Mínimo)",
+                                   labels={"Price Range": "Rango de Precio"},
+                                   marginal="violin",
+                                   color_discrete_sequence=['darkblue'])
+    st.plotly_chart(fig_hist_range)
+
+    fig_hist_close = px.histogram(df_filtered_copy, x="close", nbins=50,
+                                  title="Distribución del Precio de Cierre",
+                                  labels={"close": "Precio de Cierre"},
+                                  marginal="box",
+                                  color_discrete_sequence=['orange'])
+    st.plotly_chart(fig_hist_close)
+
+    fig_hist_ma = px.histogram(df_filtered_copy, x="Moving Average 30", nbins=50,
+                               title="Distribución de la Media Móvil (30 días)",
+                               labels={"Moving Average 30": "Media Móvil"},
+                               marginal="box",
+                               color_discrete_sequence=['gray'])
+    st.plotly_chart(fig_hist_ma)
+
+    st.write("---")
+    st.subheader("Relación entre Variables (Gráficos de Dispersión)")
+    fig_scatter_close_volume = px.scatter(df_filtered_copy, x="volume", y="close",
+                                          title="Precio de Cierre vs. Volumen de Trading",
+                                          labels={"volume": "Volumen", "close": "Precio de Cierre"},
+                                          trendline="ols",
+                                          color="Price Change %",
+                                          color_continuous_scale=px.colors.sequential.Sunset)
+    st.plotly_chart(fig_scatter_close_volume)
+
+    fig_scatter_vol_range = px.scatter(df_filtered_copy, x="Volatility", y="Price Range",
+                                       title="Volatilidad vs. Rango de Precio Diario",
+                                       labels={"Volatility": "Volatilidad", "Price Range": "Rango de Precio"},
+                                       trendline="ols",
+                                       color="year",
+                                       color_continuous_scale=px.colors.sequential.Rainbow)
+    st.plotly_chart(fig_scatter_vol_range)
+
+    fig_scatter_close_ma = px.scatter(df_filtered_copy, x="date", y="close",
+                                      title="Precio de Cierre vs. Media Móvil (30 días)",
+                                      labels={"close": "Precio de Cierre", "date": "Fecha"},
+                                      color_discrete_sequence=['blue'])
+    fig_scatter_close_ma.add_scatter(x=df_filtered_copy["date"], y=df_filtered_copy["Moving Average 30"],
+                                     mode='lines', name='Media Móvil 30', line=dict(color='red'))
+    st.plotly_chart(fig_scatter_close_ma)
+
+
+# Pestaña 7: Composición (Gráficos de torta)
 with tab_composition:
     st.header("Composición y Proporciones")
 

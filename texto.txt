@@ -53,6 +53,28 @@ Verificación: La terminal mostrará la url de un túnel local para acceder al d
 Tu navegador web predeterminado se abrirá automáticamente en esa URL. O en su defecto, deberás digitar la contraseña de acceso, la cual podrás encontrar en la ejecución del dashboard
 El dashboard mostrará los datos históricos, un gráfico interactivo, la predicción para el día siguiente y, si se configuró, los detalles del modelo.
 
+8. Ejecución del Script enricher.py (Enriquecimiento de Datos)
+Una vez recolectados los datos, este script procesa historical.db y historical.csv añadiéndoles características temporales adicionales (como año, mes, día de la semana, etc.) 
+que son cruciales para el análisis posterior. Los datos enriquecidos se guardan en una nueva base de datos: enriched_historical.db
+python src/enricher.py
+
+9. Ejecución del Script modeller.py (Entrenamiento del Modelo)
+Este script utiliza los datos enriquecidos de enriched_historical.db para entrenar un modelo de predicción (modelo ARIMA). Una vez entrenado, el modelo se serializa y 
+guarda como model.pkl, listo para ser utilizado en el dashboard.
+python src/modeller.py
+
+10. Ejecución del dashboard de Streamlit (dashboard.py)
+Finalmente, este comando inicia tu aplicación web interactiva desarrollada con Streamlit.
+streamlit run src/dashboard.py
+
+O puedes abrirlo en un navegador web con la siguiente url: https://kpis-ethereum.streamlit.app/
+
+11. Ejecución del Worflow en Git Actions
+Luego de configurarse el oden de cada una de las tareas, se creó un flujo de trabajo en Git Hub, usando un Git Actios que se ejecuta diariamente, con el fin de realizar todo 
+el proceso de manera autonoma, realizando el recorrido por cada uno de los archivos en el orden descrito y así poder visualizar en tiempo real las gráficas con los cambios de
+la moneda.
+https://github.com/ElizabethAlzateM/ProyectoV_Entrega2/blob/main/.github/workflows/workflow.yml
+
 Notas Importantes:
 Ejecuta cada comando individualmente y espera a que el anterior finalice.
 Si encuentras algún error en la terminal, cópialo y pégalo para obtener ayuda.
