@@ -5,7 +5,8 @@ permissions:
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    # Se ejecuta cada lunes a medianoche (00:00 UTC)
+    - cron: '0 0 * * 1'
   push:
     branches:
       - main
@@ -61,10 +62,10 @@ jobs:
           git config --local user.email "github-actions@github.com"
           git config --local user.name "GitHub Actions"
           git add src/proyecto/static/data/historical.db \
-                    src/proyecto/static/data/historical.csv \
-                    src/proyecto/static/data/enriched_historical.db \
-                    src/proyecto/static/models/collector.log -f \
-                    src/proyecto/static/models/arima_model.pkl
+                      src/proyecto/static/data/historical.csv \
+                      src/proyecto/static/data/enriched_historical.db \
+                      src/proyecto/static/models/collector.log -f \
+                      src/proyecto/static/models/arima_model.pkl
           git commit -m "Actualizar datos económicos y ejecutar pipelines" || echo "No hay cambios para commitear"
           git push origin main
 
